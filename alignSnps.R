@@ -63,13 +63,13 @@ flipAllele <- function( allele )
 
 
 # ---------------------------------------------------------------------------------- #
-alignSnps <- function( BIM1, BIM2, geno.dat)
+alignSnps <- function( geno.dat, BIM1, BIM2, snp )
 # align snps in BIM1 to BIM2, flip corresponding genotypes in geno.dat
 # BIM1, BIM2 (data.frame), bim files from plink
 # geno.dat (data.frame), genotype data imported by BEDMatrix
 {
-  bim1 <- BIM1[ which(BIM1$V2 == colnames(geno.dat)[1]),]
-  bim2 <- BIM2[ which(BIM2$V2 == colnames(geno.dat)[1]),]
+  bim1 <- BIM1[ which(BIM1$V2 == snp),]
+  bim2 <- BIM2[ which(BIM2$V2 == snp),]
   
   # align alleles
   # case one, the ref and alt allele are flipped in direction
@@ -83,6 +83,7 @@ alignSnps <- function( BIM1, BIM2, geno.dat)
   # eg C T  and G A
   if( sum( c(bim1$V5, bim1$V6) %in% c(bim2$V5, bim2$V6)) == 0)
   {
+    
     bim2$V5 <- flipAllele(bim2$V5)
     bim2$V6 <- flipAllele(bim2$V6)
     
