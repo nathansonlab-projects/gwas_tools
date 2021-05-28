@@ -41,6 +41,7 @@ flipAllele <- function( allele )
 # input: allele (character), one of AGCT
 # output: allele (character), one of AGCT, flipped from input
 {
+  allele <- as.character(allele)
   if( allele == "A")
   {
     return("T")
@@ -63,24 +64,38 @@ flipAllele <- function( allele )
 
 
 # ---------------------------------------------------------------------------------- #
-alignSnps <- function( geno.dat, BIM1, BIM2, snp )
+alignSnps <- function( snp, BIM1, BIM2, geno.dat )
 # align snps in BIM1 to BIM2, flip corresponding genotypes in geno.dat
 # BIM1, BIM2 (data.frame), bim files from plink
 # geno.dat (data.frame), genotype data imported by BEDMatrix
 {
+  if( length(which(BIM1$V2 == snp)) == 0)
+  {
+    print(paste0("dim(BIM1) = ", dim(BIM1)))
+    print(paste0("dim(BIM2) = ", dim(BIM1)))
+    print(paste0("snp = ", snp))
+  }
+  
+  BIM1$V2 <- as.character(BIM1$V2)
+  BIM2$V2 <- as.character(BIM2$V2)
+  
   bim1 <- BIM1[ which(BIM1$V2 == snp),]
   bim2 <- BIM2[ which(BIM2$V2 == snp),]
+  geno <- geno.dat[,snp]
   
   # align alleles
   # case one, the ref and alt allele are flipped in direction
   # eg C T  and T C
   if( checkGenoFlip(bim1, bim2))
   {
-    geno.dat <- flipGeno(geno.dat)
+    geno <- flipGeno(geno)
   }
   
   # case two, the ref and alt allele are flipped in both name and/or direction
   # eg C T  and G A
+  
+  print(paste0("bim2$V5 == ", bim2$V5))
+  print(paste0("bim2$V6 == ", bim2$V6))
   if( sum( c(bim1$V5, bim1$V6) %in% c(bim2$V5, bim2$V6)) == 0)
   {
     
@@ -89,13 +104,14 @@ alignSnps <- function( geno.dat, BIM1, BIM2, snp )
     
     if( checkGenoFlip(bim1, bim2) )
     {
-      geno.dat <- flipGeno(geno.dat)
+      geno <- flipGeno(geno)
     }
   }
   
-  return(geno.dat)
+  return(geno)
 }
 # ---------------------------------------------------------------------------------- #
 
 # sample call:
-# tmp <- apply(dat2[[1]], 2, alignSnps, BIM1, BIM2)
+#test = lapply(colnames(dat1[[1]][,1:10]), alignSnps, BIM1, BIM2, dat1[[1]])
+#out <- matrix(unlist(test), nrow=226,ncol=10)
