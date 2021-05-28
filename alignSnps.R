@@ -41,7 +41,9 @@ flipAllele <- function( allele )
 # input: allele (character), one of AGCT
 # output: allele (character), one of AGCT, flipped from input
 {
+  print(paste0("allele = ", allele))
   allele <- as.character(allele)
+  
   if( allele == "A")
   {
     return("T")
